@@ -200,8 +200,10 @@ class NearestNeighborDistanceMetric(object):
             `targets[i]` and `features[j]`.
 
         """
+        import time
+        st=time.time()
         cost_matrix_a = np.zeros((len(targets), len(detection_features[0])))
         for i, target in enumerate(targets):
             cost_matrix_a[i, :] = self._metric(self.cfg, self.samples[target], detection_features, dims, phalp_tracker)
-        
+        print("Time for distance: ", time.time()-st)
         return cost_matrix_a

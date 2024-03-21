@@ -198,7 +198,6 @@ class PHALP(nn.Module):
                 ed = time.time()
                 pred_bbox, pred_bbox_pad, pred_masks, pred_scores, pred_classes, gt_tids, gt_annots = self.get_detections(image_frame, frame_name, t_, additional_data, measurments)
                 print("Time to detection: ", time.time()-ed)
-                ed=time.time()
                 ############ Run EXTRA models to attach to the detections ##############
                 extra_data = self.run_additional_models(image_frame, pred_bbox, pred_masks, pred_scores, pred_classes, frame_name, t_, measurments, gt_tids, gt_annots)
                 
@@ -207,8 +206,6 @@ class PHALP(nn.Module):
                 ############ tracking ##############
                 self.tracker.predict()
                 self.tracker.update(detections, t_, frame_name, self.cfg.phalp.shot)
-                print("Time to tracking: ", time.time()-ed)
-                ed=time.time()
 
                 ############ record the results ##############
                 final_visuals_dic.setdefault(frame_name, {'time': t_, 'shot': self.cfg.phalp.shot, 'frame_path': frame_name})
