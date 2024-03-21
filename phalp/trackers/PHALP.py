@@ -396,16 +396,11 @@ class PHALP(nn.Module):
             if bbox[p_][2]-bbox[p_][0]<self.cfg.phalp.small_w or bbox[p_][3]-bbox[p_][1]<self.cfg.phalp.small_h:
                 continue
             masked_image, center_, scale_, rles, center_pad, scale_pad = self.get_croped_image(image, bbox[p_], bbox_pad[p_], seg_mask[p_])
-            # masked_image_list.append(masked_image)
-            # center_list.append(center_pad)
-            # scale_list.append(scale_pad)
-            # rles_list.append(rles)
-            # selected_ids.append(p_)
-            masked_image_list.extend([masked_image]*3)
-            center_list.extend([center_pad]*3)
-            scale_list.extend([scale_pad]*3)
-            rles_list.extend([rles]*3)
-            selected_ids.extend([p_]*3)
+            masked_image_list.append(masked_image)
+            center_list.append(center_pad)
+            scale_list.append(scale_pad)
+            rles_list.append(rles)
+            selected_ids.append(p_)
         
         if(len(masked_image_list)==0): return []
 
