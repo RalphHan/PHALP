@@ -24,7 +24,7 @@ class VideoConfig:
 
 @dataclass
 class PHALPConfig:
-    predict: str = 'TPL'
+    predict: str = 'APL'
     pose_distance: str = 'smpl'
     distance_type: str = 'EQ_019'
     alpha: float = 0.1
