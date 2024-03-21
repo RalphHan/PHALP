@@ -396,15 +396,20 @@ class PHALP(nn.Module):
             if bbox[p_][2]-bbox[p_][0]<self.cfg.phalp.small_w or bbox[p_][3]-bbox[p_][1]<self.cfg.phalp.small_h:
                 continue
             masked_image, center_, scale_, rles, center_pad, scale_pad = self.get_croped_image(image, bbox[p_], bbox_pad[p_], seg_mask[p_])
-            masked_image_list.append(masked_image)
-            center_list.append(center_pad)
-            scale_list.append(scale_pad)
-            rles_list.append(rles)
-            selected_ids.append(p_)
+            # masked_image_list.append(masked_image)
+            # center_list.append(center_pad)
+            # scale_list.append(scale_pad)
+            # rles_list.append(rles)
+            # selected_ids.append(p_)
+            masked_image_list.extend([masked_image]*5)
+            center_list.extend([center_pad]*5)
+            scale_list.extend([scale_pad]*5)
+            rles_list.extend([rles]*5)
+            selected_ids.extend([p_]*5)
         
         if(len(masked_image_list)==0): return []
 
-        masked_image_list = torch.stack(masked_image_list*5, dim=0)
+        masked_image_list = torch.stack(masked_image_list, dim=0)
         BS = masked_image_list.size(0)
         
         with torch.no_grad():
