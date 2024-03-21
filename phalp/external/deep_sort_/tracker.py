@@ -76,7 +76,9 @@ class Tracker:
             A list of detections at the current time step.
 
         """
+        st = time.time()
         matches, unmatched_tracks, unmatched_detections, statistics = self._match(detections)
+        print(f"Time for matching: {time.time()-st}")
         self.tracked_cost[frame_t] = [statistics[0], matches, unmatched_tracks, unmatched_detections, statistics[1], statistics[2], statistics[3], statistics[4]] 
         if(self.cfg.verbose): print(np.round(np.array(statistics[0]), 2))
 
@@ -104,9 +106,8 @@ class Tracker:
             uv_maps       += [track.track_data['prediction']['uv'][-1]]
             targets       += [track.track_id]
             
-        st=time.time()
+
         self.metric.partial_fit(np.asarray(appe_features), np.asarray(loca_features), np.asarray(pose_features), np.asarray(uv_maps), np.asarray(targets), active_targets)
-        print("Partial fit time: ", time.time()-st)
         return matches
         
     def _match(self, detections):
