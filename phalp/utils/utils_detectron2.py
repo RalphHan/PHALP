@@ -213,7 +213,7 @@ class DefaultPredictor_Lazy:
             image = self.aug(T.AugInput(original_image)).apply_image(original_image)
             image = torch.as_tensor(image.astype("float32").transpose(2, 0, 1))
             inputs = {"image": image, "height": height, "width": width}
-            predictions = self.model([inputs]*10)[0]
+            predictions = self.model([inputs]*5)[0]
             return predictions
         
     def predict_with_bbox(self, original_image, inst):
