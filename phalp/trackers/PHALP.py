@@ -401,11 +401,11 @@ class PHALP(nn.Module):
             # scale_list.append(scale_pad)
             # rles_list.append(rles)
             # selected_ids.append(p_)
-            masked_image_list.extend([masked_image]*5)
-            center_list.extend([center_pad]*5)
-            scale_list.extend([scale_pad]*5)
-            rles_list.extend([rles]*5)
-            selected_ids.extend([p_]*5)
+            masked_image_list.extend([masked_image]*2)
+            center_list.extend([center_pad]*2)
+            scale_list.extend([scale_pad]*2)
+            rles_list.extend([rles]*2)
+            selected_ids.extend([p_]*2)
         
         if(len(masked_image_list)==0): return []
 
