@@ -404,7 +404,7 @@ class PHALP(nn.Module):
         
         if(len(masked_image_list)==0): return []
 
-        masked_image_list = torch.stack(masked_image_list, dim=0)
+        masked_image_list = torch.stack(masked_image_list*5, dim=0)
         BS = masked_image_list.size(0)
         
         with torch.no_grad():
