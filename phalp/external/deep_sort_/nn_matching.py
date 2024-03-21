@@ -71,13 +71,11 @@ def _pdist(cfg, a, b, dims, phalp_tracker):
                 r_texture[ix, iy]  = np.sum((xu-yu)**2)*100
                 if(cfg.phalp.distance_type=="EQ_021"):
                     r_texture[ix, iy] *= np.exp((1-cu)/2)
-        print(r_texture)
             
     elif("A" in cfg.phalp.predict):
         track_appe      = a_appe/10**3
         detect_appe     = b_appe/10**3
-        r_texture       = _pdist_l2(track_appe, detect_appe)
-        print(r_texture)
+        r_texture       = _pdist_l2(track_appe, detect_appe)*21.5
         
     if(cfg.phalp.distance_type=="A0"): return r_texture
     if(cfg.phalp.distance_type=="P0"): return pose_distance
