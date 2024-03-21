@@ -136,7 +136,9 @@ class PHALP(nn.Module):
         except: 
             pass
         
-    def track(self):
+    def track(self, video_source=None):
+        if video_source is None:
+            video_source = self.cfg.video.source
         
         eval_keys       = ['tracked_ids', 'tracked_bbox', 'tid', 'bbox', 'tracked_time']
         history_keys    = ['appe', 'loca', 'pose', 'uv'] if self.cfg.render.enable else []
@@ -149,11 +151,11 @@ class PHALP(nn.Module):
         
         # process the source video and return a list of frames
         # source can be a video file, a youtube link or a image folder
-        io_data = self.io_manager.get_frames_from_source()
+        io_data = self.io_manager.get_frames_from_source(video_source)
         list_of_frames, additional_data = io_data['list_of_frames'], io_data['additional_data']
-        self.cfg.video_seq = io_data['video_name']
-        pkl_path = self.cfg.video.output_dir + '/results/' + self.cfg.track_dataset + "_" + str(self.cfg.video_seq) + '.pkl'
-        video_path = self.cfg.video.output_dir + '/' + self.cfg.base_tracker + '_' + str(self.cfg.video_seq) + '.mp4'
+        video_seq = io_data['video_name']
+        pkl_path = self.cfg.video.output_dir + '/results/' + self.cfg.track_dataset + "_" + str(video_seq) + '.pkl'
+        video_path = self.cfg.video.output_dir + '/' + self.cfg.base_tracker + '_' + str(video_seq) + '.mp4'
         
         # check if the video is already processed                                  
         if(not(self.cfg.overwrite) and os.path.isfile(pkl_path)): 
@@ -166,17 +168,17 @@ class PHALP(nn.Module):
         self.setup_deepsort()
         self.default_setup()
         
-        log.info("Saving tracks at : " + self.cfg.video.output_dir + '/results/' + str(self.cfg.video_seq))
+        log.info("Saving tracks at : " + self.cfg.video.output_dir + '/results/' + str(video_seq))
         
         try: 
             
             list_of_frames = list_of_frames if self.cfg.phalp.start_frame==-1 else list_of_frames[self.cfg.phalp.start_frame:self.cfg.phalp.end_frame]
-            list_of_shots = self.get_list_of_shots(list_of_frames)
+            list_of_shots = self.get_list_of_shots(list_of_frames, video_seq)
             
             tracked_frames = []
             final_visuals_dic = {}
             
-            for t_, frame_name in progress_bar(enumerate(list_of_frames), description="Tracking : " + self.cfg.video_seq, total=len(list_of_frames), disable=False):
+            for t_, frame_name in progress_bar(enumerate(list_of_frames), description="Tracking : " + video_seq, total=len(list_of_frames), disable=False):
                 
                 image_frame               = self.io_manager.read_frame(frame_name)
                 img_height, img_width, _  = image_frame.shape
@@ -263,7 +265,7 @@ class PHALP(nn.Module):
 
             joblib.dump(final_visuals_dic, pkl_path, compress=3)
             self.io_manager.close_video()
-            if(self.cfg.use_gt): joblib.dump(self.tracker.tracked_cost, self.cfg.video.output_dir + '/results/' + str(self.cfg.video_seq) + '_' + str(self.cfg.phalp.start_frame) + '_distance.pkl')
+            if(self.cfg.use_gt): joblib.dump(self.tracker.tracked_cost, self.cfg.video.output_dir + '/results/' + str(video_seq) + '_' + str(self.cfg.phalp.start_frame) + '_distance.pkl')
             
             return final_visuals_dic, pkl_path
             
@@ -602,14 +604,14 @@ class PHALP(nn.Module):
 
         return r2
 
-    def get_list_of_shots(self, list_of_frames):
+    def get_list_of_shots(self, list_of_frames, video_seq):
         # https://github.com/Breakthrough/PySceneDetect
         list_of_shots    = []
         remove_tmp_video = False
         if(self.cfg.detect_shots):
             if(isinstance(list_of_frames[0], str)):
                 # make a video if list_of_frames is frames
-                video_tmp_name   = self.cfg.video.output_dir + "/_TMP/" + str(self.cfg.video_seq) + ".mp4"
+                video_tmp_name   = self.cfg.video.output_dir + "/_TMP/" + str(video_seq) + ".mp4"
                 for ft_, fname_ in enumerate(list_of_frames):
                     im_ = cv2.imread(fname_)
                     if(ft_==0): 

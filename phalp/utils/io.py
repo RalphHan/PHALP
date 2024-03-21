@@ -21,10 +21,10 @@ class IO_Manager():
         self.output_fps = cfg.render.fps
         self.video = None
 
-    def get_frames_from_source(self):
+    def get_frames_from_source(self, video_source):
 
         # source path can be a video, or a directory of images, youtube link, or a pkl file with keys as frames
-        source_path = self.cfg.video.source
+        source_path = video_source
 
         # {key: frame name, value: {"gt_bbox": None, "extra data": None}}
         additional_data = {}
