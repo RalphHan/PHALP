@@ -151,11 +151,7 @@ class PHALP(nn.Module):
         
         # process the source video and return a list of frames
         # source can be a video file, a youtube link or a image folder
-        import time
-        ed=time.time()
         io_data = self.io_manager.get_frames_from_source(video_source)
-        print("Time to get frames from source: ", time.time()-ed)
-        ed=time.time()
         list_of_frames, additional_data = io_data['list_of_frames'], io_data['additional_data']
         video_seq = io_data['video_name']
         pkl_path = self.cfg.video.output_dir + '/results/' + self.cfg.track_dataset + "_" + str(video_seq) + '.pkl'
@@ -185,8 +181,6 @@ class PHALP(nn.Module):
             for t_, frame_name in progress_bar(enumerate(list_of_frames), description="Tracking : " + video_seq, total=len(list_of_frames), disable=False):
                 
                 image_frame               = self.io_manager.read_frame(frame_name)
-                print("Time to read frame: ", time.time()-ed)
-                ed=time.time()
                 img_height, img_width, _  = image_frame.shape
                 new_image_size            = max(img_height, img_width)
                 top, left                 = (new_image_size - img_height)//2, (new_image_size - img_width)//2,
@@ -200,6 +194,8 @@ class PHALP(nn.Module):
                     self.visualizer.reset_render(self.cfg.render.res*self.cfg.render.up_scale)
                 
                 ############ detection ##############
+                import time
+                ed = time.time()
                 pred_bbox, pred_bbox_pad, pred_masks, pred_scores, pred_classes, gt_tids, gt_annots = self.get_detections(image_frame, frame_name, t_, additional_data, measurments)
                 print("Time to detection: ", time.time()-ed)
                 ed=time.time()
@@ -208,8 +204,6 @@ class PHALP(nn.Module):
                 
                 ############ HMAR ##############
                 detections = self.get_human_features(image_frame, pred_masks, pred_bbox, pred_bbox_pad, pred_scores, frame_name, pred_classes, t_, measurments, gt_tids, gt_annots, extra_data)
-                print("Time to human: ", time.time()-ed)
-                ed=time.time()
                 ############ tracking ##############
                 self.tracker.predict()
                 self.tracker.update(detections, t_, frame_name, self.cfg.phalp.shot)
@@ -254,8 +248,6 @@ class PHALP(nn.Module):
 
                                 for hkey_ in history_keys:    final_visuals_dic[frame_name_][hkey_].append(track_data_hist_[hkey_])
                                 for pkey_ in prediction_keys: final_visuals_dic[frame_name_][pkey_].append(track_data_pred_[pkey_.split('_')[1]][-1])
-                print("Time to record: ", time.time()-ed)
-                ed=time.time()
                 ############ save the video ##############
                 if(self.cfg.render.enable and t_>=self.cfg.phalp.n_init):                    
                     d_ = self.cfg.phalp.n_init+1 if(t_+1==len(list_of_frames)) else 1
