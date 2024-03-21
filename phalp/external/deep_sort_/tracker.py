@@ -4,6 +4,8 @@ Modified code from https://github.com/nwojke/deep_sort
 
 from __future__ import absolute_import
 
+import time
+
 import numpy as np
 import torch
 
@@ -102,9 +104,9 @@ class Tracker:
             uv_maps       += [track.track_data['prediction']['uv'][-1]]
             targets       += [track.track_id]
             
-            
+        st=time.time()
         self.metric.partial_fit(np.asarray(appe_features), np.asarray(loca_features), np.asarray(pose_features), np.asarray(uv_maps), np.asarray(targets), active_targets)
-        
+        print("Partial fit time: ", time.time()-st)
         return matches
         
     def _match(self, detections):
