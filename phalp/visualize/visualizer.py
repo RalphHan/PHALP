@@ -281,8 +281,7 @@ class Visualizer(nn.Module):
         cv_image     = final_visuals_dic['frame']
         tracked_ids  = final_visuals_dic["tid"]
         tracked_time = final_visuals_dic["tracked_time"]
-        
-        tracked_mask = final_visuals_dic["mask"]
+
         tracked_bbox = final_visuals_dic["bbox"]
         
         tracked_smpl = final_visuals_dic["smpl"]
@@ -326,7 +325,6 @@ class Visualizer(nn.Module):
         if(len(tracked_ids)>0):
             tracked_time              = np.array(tracked_time)
             tracked_smpl              = np.array(tracked_smpl)
-            tracked_mask              = np.array(tracked_mask)
             tracked_bbox              = np.array(tracked_bbox)
             tracked_cameras           = np.array(tracked_cameras)
             tracked_cameras[:, 2]     = tracked_cameras[:, 2]/self.cfg.render.up_scale
