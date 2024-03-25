@@ -194,10 +194,7 @@ class PHALP(nn.Module):
                     self.visualizer.reset_render(self.cfg.render.res*self.cfg.render.up_scale)
 
                 ############ detection ##############
-                import time
-                ed = time.time()
                 pred_bbox, pred_bbox_pad, pred_scores, pred_classes, gt_tids, gt_annots = self.get_detections(image_frame, frame_name, t_, additional_data, measurments)
-                print("Time to detection: ", time.time()-ed)
                 ############ Run EXTRA models to attach to the detections ##############
                 extra_data = self.run_additional_models(image_frame, pred_bbox, pred_scores, pred_classes, frame_name, t_, measurments, gt_tids, gt_annots)
 
@@ -330,8 +327,8 @@ class PHALP(nn.Module):
             pred_classes= instances_people.pred_classes.cpu().numpy()
 
         else:
-            outputs     = self.detector(image)
-            outputs     = outputs[outputs[:, -2] > self.cfg.phalp.low_th_c].cpu().numpy()
+            outputs     = self.detector(image).cpu().numpy()
+            # outputs     = outputs[outputs[:, -2] > self.cfg.phalp.low_th_c]
 
             pred_bbox   = outputs[:,:4]
             pred_scores = outputs[:, -2]
