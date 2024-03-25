@@ -1,7 +1,6 @@
 import os
 import traceback
 import warnings
-from pathlib import Path
 
 warnings.filterwarnings('ignore')
 
@@ -13,7 +12,6 @@ import torch.nn as nn
 from detectron2 import model_zoo
 from detectron2.config import get_cfg
 from detectron2.structures import Boxes, Instances
-from hmr2.datasets.utils import expand_bbox_to_aspect_ratio
 from pycocotools import mask as mask_utils
 from scenedetect import AdaptiveDetector, detect
 from sklearn.linear_model import Ridge
@@ -29,8 +27,7 @@ from phalp.utils.io import IO_Manager
 from phalp.utils.utils import (convert_pkl, get_prediction_interval,
                                progress_bar, smpl_to_pose_camera_vector)
 from phalp.utils.utils_dataset import process_image, process_mask
-from phalp.utils.utils_detectron2 import (DefaultPredictor_Lazy,
-                                          DefaultPredictor_with_RPN)
+from phalp.utils.utils_detectron2 import (DefaultPredictor_with_RPN)
 from phalp.utils.utils_download import cache_url
 from phalp.visualize.postprocessor import Postprocessor
 from phalp.visualize.visualizer import Visualizer
@@ -82,27 +79,37 @@ class PHALP(nn.Module):
         
     def setup_detectron2(self):
         log.info("Loading Detection model...")
-        if self.cfg.phalp.detector == 'maskrcnn':
-            self.detectron2_cfg = model_zoo.get_config('new_baselines/mask_rcnn_regnety_4gf_dds_FPN_400ep_LSJ.py', trained=True)
-            self.detectron2_cfg.model.roi_heads.box_predictor.test_score_thresh = 0.5
-            self.detectron2_cfg.model.roi_heads.box_predictor.test_nms_thresh   = 0.4
-            self.detector       = DefaultPredictor_Lazy(self.detectron2_cfg)
-            self.class_names    = self.detector.metadata.get('thing_classes')
-        elif self.cfg.phalp.detector == 'vitdet':
-            from detectron2.config import LazyConfig
-            import phalp
-            cfg_path = Path(phalp.__file__).parent/'configs'/'cascade_mask_rcnn_vitdet_h_75ep.py'
-            self.detectron2_cfg = LazyConfig.load(str(cfg_path))
-            self.detectron2_cfg.train.init_checkpoint = 'https://dl.fbaipublicfiles.com/detectron2/ViTDet/COCO/cascade_mask_rcnn_vitdet_h/f328730692/model_final_f05665.pkl'
-            for i in range(3):
-                self.detectron2_cfg.model.roi_heads.box_predictors[i].test_score_thresh = 0.5
-            self.detector = DefaultPredictor_Lazy(self.detectron2_cfg)
-        else:
-            raise ValueError(f"Detector {self.cfg.phalp.detector} not supported")        
+        # if self.cfg.phalp.detector == 'maskrcnn':
+        #     self.detectron2_cfg = model_zoo.get_config('new_baselines/mask_rcnn_regnety_4gf_dds_FPN_400ep_LSJ.py', trained=True)
+        #     self.detectron2_cfg.model.roi_heads.box_predictor.test_score_thresh = 0.5
+        #     self.detectron2_cfg.model.roi_heads.box_predictor.test_nms_thresh   = 0.4
+        #     self.detector       = DefaultPredictor_Lazy(self.detectron2_cfg)
+        #     self.class_names    = self.detector.metadata.get('thing_classes')
+        # elif self.cfg.phalp.detector == 'vitdet':
+        #     from detectron2.config import LazyConfig
+        #     import phalp
+        #     cfg_path = Path(phalp.__file__).parent/'configs'/'cascade_mask_rcnn_vitdet_h_75ep.py'
+        #     self.detectron2_cfg = LazyConfig.load(str(cfg_path))
+        #     self.detectron2_cfg.train.init_checkpoint = 'https://dl.fbaipublicfiles.com/detectron2/ViTDet/COCO/cascade_mask_rcnn_vitdet_h/f328730692/model_final_f05665.pkl'
+        #     for i in range(3):
+        #         self.detectron2_cfg.model.roi_heads.box_predictors[i].test_score_thresh = 0.5
+        #     self.detector = DefaultPredictor_Lazy(self.detectron2_cfg)
+        # else:
+        #     raise ValueError(f"Detector {self.cfg.phalp.detector} not supported")
 
         # for predicting masks with only bounding boxes, e.g. for running on ground truth tracks
-        self.setup_detectron2_with_RPN()
+        # self.setup_detectron2_with_RPN()
         # TODO: make this work with DefaultPredictor_Lazy
+        # @title Set-up model. { run: "auto" }
+        checkpoint: str = "yolov6l6.pt"  # @param ["yolov6s", "yolov6n", "yolov6t"]
+        device: str = "cpu"  # @param ["gpu", "cpu"]
+        half: bool = False  # @param {type:"boolean"}
+
+        import PIL
+        from YOLOv6.yolov6.utils.nms import non_max_suppression
+        from phalp.YOLOv6.yolov6.core.inferer import Inferer
+
+        from typing import List, Optional
         
     def setup_detectron2_with_RPN(self):
         self.detectron2_cfg = get_cfg()
