@@ -106,7 +106,7 @@ class PHALP(nn.Module):
         half: bool = False  # @param {type:"boolean"}
 
         import PIL
-        from YOLOv6.yolov6.utils.nms import non_max_suppression
+        from phalp.YOLOv6.yolov6.utils.nms import non_max_suppression
         from phalp.YOLOv6.yolov6.core.inferer import Inferer
 
         from typing import List, Optional
