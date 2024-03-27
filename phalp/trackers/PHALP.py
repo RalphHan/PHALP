@@ -260,11 +260,11 @@ class PHALP(nn.Module):
                         for tkey_ in tmp_keys_:
                             del final_visuals_dic[frame_key][tkey_]
 
-            joblib.dump(final_visuals_dic, pkl_path, compress=3)
-            self.io_manager.close_video()
+            # joblib.dump(final_visuals_dic, pkl_path, compress=3)
+            self.io_manager.close_video(video_source)
             if(self.cfg.use_gt): joblib.dump(self.tracker.tracked_cost, self.cfg.video.output_dir + '/results/' + str(video_seq) + '_' + str(self.cfg.phalp.start_frame) + '_distance.pkl')
 
-            return final_visuals_dic, pkl_path
+            return final_visuals_dic #pkl_path
 
         except Exception as e:
             print(e)
