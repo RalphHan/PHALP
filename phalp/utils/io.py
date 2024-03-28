@@ -154,10 +154,7 @@ class IO_Manager():
             raise Exception("Video is not initialized")
         self.video["video"].write(rendered_)
 
-    def close_video(self, source_path):
-        if (source_path.endswith(".mp4")):
-            video_name = source_path.split('/')[-1].split('.')[0]
-            os.system("rm -rf " + self.cfg.video.output_dir + "/_DEMO/" + video_name)
+    def close_video(self):
         if(self.video is not None):
             self.video["video"].release()
             if(self.cfg.video.useffmpeg):
