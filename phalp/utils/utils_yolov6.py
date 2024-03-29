@@ -35,7 +35,7 @@ class YOLOv6L6:
 
     @torch.no_grad()
     def __call__(self, img_src):
-        conf_thres = 0.25
+        conf_thres = 0.4
         iou_thres = 0.45
         max_det = 1000
         agnostic_nms = False
