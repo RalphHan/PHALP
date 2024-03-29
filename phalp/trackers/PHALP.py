@@ -9,10 +9,10 @@ import joblib
 import numpy as np
 import torch
 import torch.nn as nn
-from detectron2 import model_zoo
-from detectron2.config import get_cfg
-from detectron2.structures import Boxes, Instances
-from pycocotools import mask as mask_utils
+# from detectron2 import model_zoo
+# from detectron2.config import get_cfg
+# from detectron2.structures import Boxes, Instances
+# from pycocotools import mask as mask_utils
 from scenedetect import AdaptiveDetector, detect
 from sklearn.linear_model import Ridge
 
@@ -27,7 +27,7 @@ from phalp.utils.io import IO_Manager
 from phalp.utils.utils import (convert_pkl, get_prediction_interval,
                                progress_bar, smpl_to_pose_camera_vector)
 from phalp.utils.utils_dataset import process_image, process_mask
-from phalp.utils.utils_detectron2 import (DefaultPredictor_with_RPN)
+# from phalp.utils.utils_detectron2 import (DefaultPredictor_with_RPN)
 from phalp.utils.utils_yolov6 import YOLOv6L6
 from phalp.utils.utils_download import cache_url
 from phalp.visualize.postprocessor import Postprocessor
@@ -104,14 +104,14 @@ class PHALP(nn.Module):
         # @title Set-up model. { run: "auto" }
         self.detector = YOLOv6L6()
 
-    def setup_detectron2_with_RPN(self):
-        self.detectron2_cfg = get_cfg()
-        self.detectron2_cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_X_101_32x8d_FPN_3x.yaml"))
-        self.detectron2_cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
-        self.detectron2_cfg.MODEL.ROI_HEADS.NMS_THRESH_TEST   = 0.4
-        self.detectron2_cfg.MODEL.WEIGHTS   = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_X_101_32x8d_FPN_3x.yaml")
-        self.detectron2_cfg.MODEL.META_ARCHITECTURE =  "GeneralizedRCNN_with_proposals"
-        self.detector_x = DefaultPredictor_with_RPN(self.detectron2_cfg)
+    # def setup_detectron2_with_RPN(self):
+    #     self.detectron2_cfg = get_cfg()
+    #     self.detectron2_cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_X_101_32x8d_FPN_3x.yaml"))
+    #     self.detectron2_cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
+    #     self.detectron2_cfg.MODEL.ROI_HEADS.NMS_THRESH_TEST   = 0.4
+    #     self.detectron2_cfg.MODEL.WEIGHTS   = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_X_101_32x8d_FPN_3x.yaml")
+    #     self.detectron2_cfg.MODEL.META_ARCHITECTURE =  "GeneralizedRCNN_with_proposals"
+    #     self.detector_x = DefaultPredictor_with_RPN(self.detectron2_cfg)
 
     def setup_deepsort(self):
         log.info("Setting up DeepSort...")
