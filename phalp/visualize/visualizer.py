@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from PIL import Image
-from pycocotools import mask as mask_utils
+# from pycocotools import mask as mask_utils
 from torch.utils.data._utils.collate import default_collate
 from torchvision.utils import make_grid
 
